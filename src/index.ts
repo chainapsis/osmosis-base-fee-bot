@@ -62,7 +62,10 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
           gasPriceStep.high === parseFloat(high.toString())
         ) {
           console.error("No need to update");
-          return;
+
+          // continue 하면 while의 처음부터 시작되서 딜레이 없이 계속 돌아가서 2분 딜레이를 줬습니다.
+          await new Promise((r) => setTimeout(r, 1000 * 60 * 2 ));
+          continue;
         }
 
         const newGasPriceStep = {
