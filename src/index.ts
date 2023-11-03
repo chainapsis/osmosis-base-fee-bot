@@ -87,7 +87,7 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
 
         const message = {
           message: `Update ${CHAIN_NAME}'s gas price step`,
-          content: Buffer.from(JSON.stringify(newChainInfo, null, 2)).toString(
+          content: Buffer.from(JSON.stringify(newChainInfo, null, 2).trim()).toString(
             "base64",
           ),
           sha: chainInfoResult.sha,
