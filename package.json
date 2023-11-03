@@ -6,7 +6,7 @@
   "author": "HeesungB <hezo25@naver.com>",
   "license": "MIT",
   "scripts": {
-    "test": "ts-node src/index.ts",
+    "start": "ts-node src/index.ts",
     "lint:test": "eslint \"src/**/*\" && prettier --check \"src/**/*\"",
     "lint:fix": "eslint --fix \"src/**/*\" && prettier --write \"src/**/*\""
   },
