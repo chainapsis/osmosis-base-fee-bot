@@ -5,6 +5,7 @@ import { Dec } from "@keplr-wallet/unit";
 
 const REPOSITORY = "chainapsis/keplr-chain-registry";
 const CHAIN_NAME = "osmosis";
+const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
 
 (async () => {
   while(true) {
@@ -37,7 +38,7 @@ const CHAIN_NAME = "osmosis";
       if (gasPriceStep) {
         // Get Osmosis's base fee.
         const baseFeeResponse = await fetch(
-          "http://104.248.140.198:1317/osmosis/txfees/v1beta1/cur_eip_base_fee",
+          `${BASE_FEE_ENDPOINT}/osmosis/txfees/v1beta1/cur_eip_base_fee`,
         );
         const baseFeeResult: { base_fee: string } = await baseFeeResponse.json();
         const baseFee = new Dec(baseFeeResult.base_fee);
