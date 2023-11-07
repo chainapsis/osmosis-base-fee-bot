@@ -8,7 +8,7 @@ const CHAIN_NAME = "osmosis";
 const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
 
 (async () => {
-  while(true) {
+  while (true) {
     try {
       if (!process.env.GITHUB_TOKEN) {
         console.error(
@@ -40,7 +40,8 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
         const baseFeeResponse = await fetch(
           `${BASE_FEE_ENDPOINT}/osmosis/txfees/v1beta1/cur_eip_base_fee`,
         );
-        const baseFeeResult: { base_fee: string } = await baseFeeResponse.json();
+        const baseFeeResult: { base_fee: string } =
+          await baseFeeResponse.json();
         const baseFee = new Dec(baseFeeResult.base_fee);
 
         // Calculate new gas price step.
@@ -64,15 +65,24 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
           console.error("No need to update");
 
           // continue 하면 while의 처음부터 시작되서 딜레이 없이 계속 돌아가서 2분 딜레이를 줬습니다.
-          await new Promise((r) => setTimeout(r, 1000 * 60 * 2 ));
+          await new Promise((r) => setTimeout(r, 1000 * 60 * 2));
           continue;
         }
 
-        const newGasPriceStep = {
-          ...gasPriceStep,
-          average: parseFloat(average.toString()),
-          high: parseFloat(high.toString()),
-        };
+        let newGasPriceStep = {};
+        if (baseFee.gte(new Dec(0.025))) {
+          newGasPriceStep = {
+            ...gasPriceStep,
+            average: parseFloat(average.toString()),
+            high: parseFloat(high.toString()),
+          };
+        } else {
+          newGasPriceStep = {
+            low: 0.0025,
+            average: 0.025,
+            high: 0.04,
+          };
+        }
 
         // Update the gas price step.
         const newChainInfo = {
@@ -90,9 +100,9 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
 
         const message = {
           message: `Update ${CHAIN_NAME}'s gas price step`,
-          content: Buffer.from(`${JSON.stringify(newChainInfo, null, 2)}\n`).toString(
-            "base64",
-          ),
+          content: Buffer.from(
+            `${JSON.stringify(newChainInfo, null, 2)}\n`,
+          ).toString("base64"),
           sha: chainInfoResult.sha,
         };
 
@@ -108,12 +118,11 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
           },
         );
       }
-
     } catch (e: any) {
       console.log(e.message || e.toString());
     }
 
     // 2 minutes
-    await new Promise((r) => setTimeout(r, 1000 * 60 * 2 ));
+    await new Promise((r) => setTimeout(r, 1000 * 60 * 2));
   }
 })();
