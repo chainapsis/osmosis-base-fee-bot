@@ -44,33 +44,26 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
           await baseFeeResponse.json();
         const baseFee = new Dec(baseFeeResult.base_fee);
 
-        // Calculate new gas price step.
-        const low = new Dec(gasPriceStep.low);
-        let average = baseFee.mul(new Dec(1.2));
-        let high = baseFee.mul(new Dec(1.5));
+        let newGasPriceStep: {
+          low: number;
+          average: number;
+          high: number;
+        };
 
-        if (average.lt(low)) {
-          average = low;
-        }
-
-        if (high.lt(average)) {
-          high = average;
-        }
-
-        // If the gas price step is not changed, do not update.
-        if (
-          gasPriceStep.average === parseFloat(average.toString()) &&
-          gasPriceStep.high === parseFloat(high.toString())
-        ) {
-          console.error("No need to update");
-
-          // continue 하면 while의 처음부터 시작되서 딜레이 없이 계속 돌아가서 2분 딜레이를 줬습니다.
-          await new Promise((r) => setTimeout(r, 1000 * 60 * 2));
-          continue;
-        }
-
-        let newGasPriceStep = {};
         if (baseFee.gte(new Dec(0.025))) {
+          // Calculate new gas price step.
+          const low = new Dec(gasPriceStep.low);
+          let average = baseFee.mul(new Dec(1.2));
+          let high = baseFee.mul(new Dec(1.5));
+
+          if (average.lt(low)) {
+            average = low;
+          }
+
+          if (high.lt(average)) {
+            high = average;
+          }
+
           newGasPriceStep = {
             ...gasPriceStep,
             average: parseFloat(average.toString()),
@@ -82,6 +75,18 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
             average: 0.025,
             high: 0.04,
           };
+        }
+
+        // If the gas price step is not changed, do not update.
+        if (
+          gasPriceStep.average === newGasPriceStep.average &&
+          gasPriceStep.high === newGasPriceStep.high
+        ) {
+          console.error("No need to update");
+
+          // continue 하면 while의 처음부터 시작되서 딜레이 없이 계속 돌아가서 2분 딜레이를 줬습니다.
+          await new Promise((r) => setTimeout(r, 1000 * 60 * 2));
+          continue;
         }
 
         // Update the gas price step.
