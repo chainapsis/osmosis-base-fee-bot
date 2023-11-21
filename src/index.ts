@@ -53,8 +53,8 @@ const BASE_FEE_ENDPOINT = "https://lcd-osmosis.keplr.app";
         if (baseFee.gte(new Dec(0.025))) {
           // Calculate new gas price step.
           const low = new Dec(gasPriceStep.low);
-          let average = baseFee.mul(new Dec(1.2));
-          let high = baseFee.mul(new Dec(1.5));
+          let average = baseFee.mul(new Dec(2.5));
+          let high = baseFee.mul(new Dec(5));
 
           if (average.lt(low)) {
             average = low;
